@@ -1,0 +1,4 @@
+ultralytics
+opencv-python
+geocoder
+python-telegram-bot
