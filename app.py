@@ -5,16 +5,25 @@ import requests
 from datetime import datetime
 import geocoder
 from ultralytics import YOLO
+import pygame
 
+# === CONFIGURATION ===
 MODEL_PATH = "best.pt"
 TELEGRAM_TOKEN = "7963928332:AAEWcA8kHcFCkEv9tNoAj7l_sBh5rordzYI"
 TELEGRAM_CHAT_ID = "-1002813571108"
 CONFIDENCE_THRESHOLD = 0.7
 ALERT_CLASSES = ["fire", "smoke"]
 SAVE_FOLDER = "alerts"
-ALERT_COOLDOWN = 10
+ALERT_COOLDOWN = 10  # in seconds
+ALERT_SOUND_PATH = "alert.mp3"  # make sure this file exists
+
+# === INITIAL SETUP ===
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 model = YOLO(MODEL_PATH)
+
+# Initialize Pygame mixer for alert sound
+pygame.mixer.init()
+is_sound_playing = False
 
 def send_telegram_alert(image_path, label, confidence):
     try:
@@ -49,6 +58,8 @@ def send_telegram_alert(image_path, label, confidence):
         print(f"⚠️ Alert failed: {str(e)}")
 
 def main():
+    global is_sound_playing
+
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("❌ Error: Could not open video capture")
@@ -64,28 +75,32 @@ def main():
                 break
 
             results = model(frame)
+            fire_or_smoke_detected = False  # Track if any alert class is active
+
             for result in results:
                 for box in result.boxes:
                     conf = box.conf.item()
                     cls_id = int(box.cls.item())
-                    label = model.names[cls_id].lower()  # F
+                    label = model.names[cls_id].lower()
 
                     if label in ALERT_CLASSES and conf >= CONFIDENCE_THRESHOLD:
+                        fire_or_smoke_detected = True
                         now = datetime.now()
-                        
+
                         if (now - last_alert[label]).total_seconds() > ALERT_COOLDOWN:
                             x1, y1, x2, y2 = map(int, box.xyxy[0])
                             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
                             cv2.putText(
-                                frame, 
-                                f"{label.upper()} {conf:.1%}", 
-                                (x1, y1 - 10), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 
+                                frame,
+                                f"{label.upper()} {conf:.1%}",
+                                (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX,
                                 0.7, (0, 0, 255), 2
                             )
                             timestamp = now.strftime("%Y%m%d_%H%M%S")
                             image_path = os.path.join(SAVE_FOLDER, f"{label}_{timestamp}.jpg")
                             cv2.imwrite(image_path, frame)
+
                             threading.Thread(
                                 target=send_telegram_alert,
                                 args=(image_path, label, conf),
@@ -94,6 +109,21 @@ def main():
 
                             last_alert[label] = now
                             print(f"🔥 ALERT: {label} ({conf:.1%})")
+
+            # Sound control
+            if fire_or_smoke_detected and not is_sound_playing:
+                try:
+                    pygame.mixer.music.load(ALERT_SOUND_PATH)
+                    pygame.mixer.music.play(-1)  # loop indefinitely
+                    is_sound_playing = True
+                    print("🔊 Alert sound started.")
+                except Exception as e:
+                    print(f"⚠️ Sound error: {e}")
+            elif not fire_or_smoke_detected and is_sound_playing:
+                pygame.mixer.music.stop()
+                is_sound_playing = False
+                print("🔇 Alert sound stopped.")
+
             cv2.imshow('Fire/Smoke Detection (Press Q to quit)', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -103,6 +133,7 @@ def main():
     finally:
         cap.release()
         cv2.destroyAllWindows()
+        pygame.mixer.music.stop()
         print("✅ Resources released")
 
 if __name__ == "__main__":
