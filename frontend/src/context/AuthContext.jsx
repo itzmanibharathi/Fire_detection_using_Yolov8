@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Centralized API base URL (DON’T hardcode everywhere)
-  const API = "http://fire-detection-using-yolov8.onrender.com/api/auth";
+  const API = "http://fire-detection-using-yolov8.onrender.com/";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
