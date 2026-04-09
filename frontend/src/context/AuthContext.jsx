@@ -9,29 +9,28 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth
+  // Centralized API base URL (DON’T hardcode everywhere)
+  const API = "http://fire-detection-using-yolov8.onrender.com/api/auth";
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
     
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
-      // Set default header
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
     setLoading(false);
 
-    // Global interceptor for 401 ghost sessions
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
-          console.warn("Unauthorized access detected (401). Automatically logging out to wipe ghost session.");
+          console.warn("401 detected → logging out");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           delete axios.defaults.headers.common["Authorization"];
           setUser(null);
-          // Auto redirect handled by protected routes
         }
         return Promise.reject(error);
       }
@@ -44,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://fire-detection-using-yolov8.onrender.com/api/auth/login", { email, password });
+      const res = await axios.post(`${API}/login`, { email, password });
       const { token, ...userData } = res.data;
       
       localStorage.setItem("token", token);
@@ -60,13 +59,14 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, fullName, phone, organization) => {
     try {
-      const res = await axios.post("http://fire-detection-using-yolov8.onrender.com/api/auth/register", { 
+      const res = await axios.post(`${API}/register`, { 
         email, 
         password, 
         fullName, 
         phone, 
         organization 
       });
+
       const { token, ...userData } = res.data;
       
       localStorage.setItem("token", token);
@@ -82,7 +82,12 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (fullName, phone, organization) => {
     try {
-      const res = await axios.put("http://fire-detection-using-yolov8.onrender.com/api/auth/profile", { fullName, phone, organization });
+      const res = await axios.put(`${API}/profile`, {
+        fullName,
+        phone,
+        organization
+      });
+
       const newUserData = res.data;
       localStorage.setItem("user", JSON.stringify(newUserData));
       setUser(newUserData);
@@ -94,12 +99,39 @@ export const AuthProvider = ({ children }) => {
 
   const updatePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put("http://fire-detection-using-yolov8.onrender.com/api/auth/password", { currentPassword, newPassword });
+      await axios.put(`${API}/password`, {
+        currentPassword,
+        newPassword
+      });
       return true;
     } catch (error) {
       throw error.response?.data?.error || "Password update failed";
     }
   };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    delete axios.defaults.headers.common["Authorization"];
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        updateProfile,
+        updatePassword,
+        loading,
+      }}
+    >
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};  };
 
   const logout = () => {
     localStorage.removeItem("token");
