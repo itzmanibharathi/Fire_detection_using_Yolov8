@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://fire-detection-using-yolov8.onrender.com/api/detections';
+const API_URL = 'https://fire-detection-using-yolov8.onrender.com/';
 
 export const fetchDetections = async () => {
   try {
