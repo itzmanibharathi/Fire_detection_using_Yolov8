@@ -5,36 +5,43 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { FiMapPin } from "react-icons/fi";
 
-// Custom icons to fix Leaflet issue with React
-const fireIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+// Sleek animated CSS dots for live monitoring
+const fireIcon = new L.divIcon({
+  className: 'custom-div-icon',
+  html: '<div class="w-4 h-4 bg-accent rounded-full shadow-[0_0_15px_rgba(239,68,68,0.9)] animate-pulse border-2 border-white/80"></div>',
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+  popupAnchor: [0, -10]
 });
 
-const smokeIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+const smokeIcon = new L.divIcon({
+  className: 'custom-div-icon',
+  html: '<div class="w-4 h-4 bg-warning rounded-full shadow-[0_0_15px_rgba(245,158,11,0.9)] animate-pulse border-2 border-white/80"></div>',
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+  popupAnchor: [0, -10]
 });
 
-const defaultCenter = [51.505, -0.09]; // Fallback center
+const defaultCenter = [11.6500, 77.1000]; // Fallback center: Sathyamangalam (Erode)
 
 const MapView = () => {
   const [detections, setDetections] = useState([]);
   const [center, setCenter] = useState(defaultCenter);
 
-  useEffect(() => {
+useEffect(() => {
     const fetchDetections = async () => {
       try {
         const res = await axios.get("https://fire-detection-using-yolov8.onrender.com/api/detections");
-        const data = res.data.filter(d => d.lat && d.lng); // Only map items with coordinates
+        
+        // Map older database records that used 'latitude' instead of 'lat'
+        const normalizedData = res.data.map(d => ({
+          ...d,
+          lat: d.lat !== undefined ? d.lat : d.latitude,
+          lng: d.lng !== undefined ? d.lng : d.longitude
+        }));
+        
+        const data = normalizedData.filter(d => d.lat && d.lng); // Only map items with coordinates
+        
         setDetections(data);
         
         if (data.length > 0) {
