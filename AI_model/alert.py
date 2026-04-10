@@ -15,8 +15,8 @@ load_dotenv()
 
 # === LOCATION FROM ENV ===
 LOCATION_NAME = os.getenv("LOCATION_NAME", "Unknown Location")
-LATITUDE = float(os.getenv("LATITUDE", "0"))
-LONGITUDE = float(os.getenv("LONGITUDE", "0"))
+LATITUDE = float(os.getenv("Latitude", os.getenv("LATITUDE", "11.5")))
+LONGITUDE = float(os.getenv("Longitude", os.getenv("LONGITUDE", "77.2")))
 
 # === USER ACCESS CODE ===
 USER_ACCESS_CODE = os.getenv("USER_ACCESS_CODE", "DEFAULT_CODE")
@@ -72,8 +72,8 @@ def alert_handler(image_path, label, confidence):
             "label": label,
             "timestamp": timestamp,
             "location": LOCATION_NAME,
-            "latitude": LATITUDE,
-            "longitude": LONGITUDE,
+            "lat": LATITUDE,
+            "lng": LONGITUDE,
             "confidence": confidence,
             "image_url": image_url,
             "accessCode": USER_ACCESS_CODE
