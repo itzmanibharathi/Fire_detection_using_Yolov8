@@ -13,7 +13,7 @@ import {
   FiSun
 } from "react-icons/fi";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen }) => {
   const { logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
 
@@ -26,8 +26,9 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="flex flex-col w-64 bg-surface border-r border-border-subtle min-h-screen text-text-muted">
-      <div className="flex items-center justify-between px-4 h-20 border-b border-border-subtle">
+    <div className={`fixed inset-y-0 left-0 z-50 transform w-64 bg-surface border-r border-border-subtle min-h-screen text-text-muted transition-transform duration-300 md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className="flex flex-col bg-surface h-full">
+      <div className="flex items-center justify-between px-4 h-20 border-b border-border-subtle shrink-0">
         <div className="flex items-center">
           <FiShield className="w-8 h-8 text-accent mr-3" />
           <h1 className="text-xl font-bold text-text-main tracking-widest uppercase">FireWatch ID</h1>
@@ -43,6 +44,7 @@ const Sidebar = () => {
             <NavLink
               key={item.name}
               to={item.path}
+              onClick={() => setIsOpen && setIsOpen(false)}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 rounded-xl transition-all duration-300 group ${
                   isActive 
@@ -66,6 +68,7 @@ const Sidebar = () => {
           <FiLogOut className="w-5 h-5 mr-3" />
           <span className="font-medium">Logout</span>
         </button>
+      </div>
       </div>
     </div>
   );
