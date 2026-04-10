@@ -16,7 +16,7 @@ const Insights = () => {
   const fetchAnalysis = async () => {
     setLoadingAnalysis(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/analyze");
+      const res = await axios.post("https://fire-detection-using-yolov8.onrender.com/api/ai/analyze");
       setSummary(res.data.summary);
       setMeta(res.data.meta);
     } catch (err) {
@@ -45,7 +45,7 @@ const Insights = () => {
     setLoadingChat(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/query", { query: userMessage.content });
+      const res = await axios.post("https://fire-detection-using-yolov8.onrender.com/api/ai/query", { query: userMessage.content });
       setChatHistory([...chatHistory, userMessage, { role: "ai", content: res.data.answer }]);
     } catch (err) {
       const serverDetails = err.response?.data?.details || err.response?.data?.error || err.message;

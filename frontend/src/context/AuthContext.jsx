@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-    
+
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
       // Set default header
@@ -44,12 +44,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://fire-detection-using-yolov8.onrender.com/api/auth/login", { email, password });
+
+      const res = await axios.post("https://fire-detection-using-yolov8.onrender.com/api/auth/login", { email, password });
       const { token, ...userData } = res.data;
-      
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
-      
+
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(userData);
       return true;
@@ -60,18 +61,18 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, fullName, phone, organization) => {
     try {
-      const res = await axios.post("http://fire-detection-using-yolov8.onrender.com/api/auth/register", { 
-        email, 
-        password, 
-        fullName, 
-        phone, 
-        organization 
+
+      const res = await axios.post("https://fire-detection-using-yolov8.onrender.com/api/auth/register", {
+        password,
+        fullName,
+        phone,
+        organization
       });
       const { token, ...userData } = res.data;
-      
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
-      
+
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setUser(userData);
       return true;
@@ -82,7 +83,9 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (fullName, phone, organization) => {
     try {
-      const res = await axios.put("http://fire-detection-using-yolov8.onrender.com/api/auth/profile", { fullName, phone, organization });
+
+      const res = await axios.put("https://fire-detection-using-yolov8.onrender.com/api/auth/profile", { fullName, phone, organization });
+
       const newUserData = res.data;
       localStorage.setItem("user", JSON.stringify(newUserData));
       setUser(newUserData);
@@ -94,7 +97,9 @@ export const AuthProvider = ({ children }) => {
 
   const updatePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put("http://fire-detection-using-yolov8.onrender.com/api/auth/password", { currentPassword, newPassword });
+
+      await axios.put("https://fire-detection-using-yolov8.onrender.com/api/auth/password", { currentPassword, newPassword });
+
       return true;
     } catch (error) {
       throw error.response?.data?.error || "Password update failed";

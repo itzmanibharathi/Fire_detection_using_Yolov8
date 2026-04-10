@@ -33,7 +33,7 @@ const MapView = () => {
   useEffect(() => {
     const fetchDetections = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/detections");
+        const res = await axios.get("https://fire-detection-using-yolov8.onrender.com/api/detections");
         const data = res.data.filter(d => d.lat && d.lng); // Only map items with coordinates
         setDetections(data);
         

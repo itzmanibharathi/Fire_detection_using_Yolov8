@@ -12,7 +12,7 @@ const Dashboard = () => {
 
   const fetchDetections = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/detections");
+      const res = await axios.get("https://fire-detection-using-yolov8.onrender.com/api/detections");
       setDetections(res.data);
       
       const fireCount = res.data.filter(d => d.label === "fire").length;

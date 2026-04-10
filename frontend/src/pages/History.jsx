@@ -13,7 +13,7 @@ const History = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let url = "http://localhost:5000/api/detections";
+        let url = "https://fire-detection-using-yolov8.onrender.com/api/detections";
         const queryParams = [];
         if (startDate && endDate) {
           queryParams.push(`startDate=${startDate}&endDate=${endDate}`);
