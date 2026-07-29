@@ -69,15 +69,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, fullName, phone, organization) => {
+    const register = async (email, password, fullName, phone, organization) => {
     try {
-      const res = await api.post("/api/auth/register", { 
+      const payload = { 
         email, 
         password, 
         fullName, 
         phone, 
         organization 
-      });
+      };
+      console.log("Submitting registration with payload:", payload);
+      const res = await api.post("/api/auth/register", payload);
       const { token, ...userData } = res.data;
       
       localStorage.setItem("token", token);
