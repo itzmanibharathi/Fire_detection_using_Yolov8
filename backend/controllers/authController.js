@@ -10,6 +10,7 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
+  console.log("Registration request received:", req.body);
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: "Database connection unavailable. Please check backend MongoDB configuration." });
