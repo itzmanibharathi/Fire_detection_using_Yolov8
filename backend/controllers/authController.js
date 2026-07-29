@@ -17,16 +17,18 @@ const registerUser = async (req, res) => {
 
         const { email, password, fullName, phone, organization } = req.body;
 
-    if (!email || !password || !fullName || !phone || !organization) {
-      console.log("Registration failed - missing fields:", { 
-        email: !!email, 
-        password: !!password, 
-        fullName: !!fullName, 
-        phone: !!phone, 
-        organization: !!organization 
-      });
-      return res.status(400).json({ error: "Please provide all required fields" });
-    }
+        if (!email || !password || !fullName || !phone || !organization) {
+          const missing = [];
+          if (!email) missing.push("email");
+          if (!password) missing.push("password");
+          if (!fullName) missing.push("fullName");
+          if (!phone) missing.push("phone");
+          if (!organization) missing.push("organization");
+      
+          return res.status(400).json({ 
+            error: `Missing required fields: ${missing.join(", ")}` 
+          });
+        }
 
     const normalizedEmail = email.trim().toLowerCase();
 
