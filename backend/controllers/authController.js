@@ -15,9 +15,16 @@ const registerUser = async (req, res) => {
       return res.status(503).json({ error: "Database connection unavailable. Please check backend MongoDB configuration." });
     }
 
-    const { email, password, fullName, phone, organization } = req.body;
+        const { email, password, fullName, phone, organization } = req.body;
 
     if (!email || !password || !fullName || !phone || !organization) {
+      console.log("Registration failed - missing fields:", { 
+        email: !!email, 
+        password: !!password, 
+        fullName: !!fullName, 
+        phone: !!phone, 
+        organization: !!organization 
+      });
       return res.status(400).json({ error: "Please provide all required fields" });
     }
 
