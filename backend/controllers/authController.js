@@ -10,26 +10,25 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
-  console.log("Registration request received:", req.body);
+  console.log("DEBUG: Registration attempt with body:", req.body);
   try {
     if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({ error: "Database connection unavailable. Please check backend MongoDB configuration." });
+      return res.status(503).json({ error: "Database connection unavailable." });
     }
 
-        const { email, password, fullName, phone, organization } = req.body;
+    const { email, password, fullName, phone, organization } = req.body;
 
-        if (!email || !password || !fullName || !phone || !organization) {
-          const missing = [];
-          if (!email) missing.push("email");
-          if (!password) missing.push("password");
-          if (!fullName) missing.push("fullName");
-          if (!phone) missing.push("phone");
-          if (!organization) missing.push("organization");
+    if (!email || !password || !fullName || !phone || !organization) {
+      const missing = [];
+      if (!email) missing.push("email");
+      if (!password) missing.push("password");
+      if (!fullName) missing.push("fullName");
+      if (!phone) missing.push("phone");
+      if (!organization) missing.push("organization");
       
-          return res.status(400).json({ 
-            error: `Missing required fields: ${missing.join(", ")}` 
-          });
-        }
+      console.log("DEBUG: Missing fields:", missing);
+      return res.status(400).json({ error: `Please provide all required fields. Missing: ${missing.join(', ')}` });
+    }
 
     const normalizedEmail = email.trim().toLowerCase();
 
