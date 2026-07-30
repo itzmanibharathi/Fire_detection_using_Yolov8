@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-// Resolve backend URL dynamically based on environment or window location
 const getBaseUrl = () => {
-  // FORCED NEW URL - Removing all fallback logic to ensure correct connection
-  return 'https://fireguard-pws7.onrender.com';
+  // Pointing to the BACKEND service, not the frontend
+  return 'https://fire-detection-using-yolov8.onrender.com';
 };
 
 const api = axios.create({
