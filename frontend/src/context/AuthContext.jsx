@@ -72,13 +72,15 @@ export const AuthProvider = ({ children }) => {
     const register = async (email, password, fullName, phone, organization) => {
     try {
       const payload = { 
-        email, 
-        password, 
-        fullName, 
-        phone, 
-        organization 
+        email: email.trim(), 
+        password: password, 
+        fullName: fullName.trim(), 
+        phone: phone.trim(), 
+        organization: organization.trim() 
       };
-      console.log("Submitting registration with payload:", payload);
+      
+      console.log("DEBUG: Frontend Sending Registration Payload:", payload);
+      
       const res = await api.post("/api/auth/register", payload);
       const { token, ...userData } = res.data;
       
