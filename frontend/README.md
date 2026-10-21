@@ -1,16 +1,36 @@
-# React + Vite
+# FireWatch Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite 7 + Tailwind CSS 4 dashboard for the FireWatch fire detection system.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+cp .env.example .env    # Optionally set VITE_BACKEND_URL
+npm install
+npm run dev             # http://localhost:5173
+```
 
-## React Compiler
+## Build for Production
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm run build           # Output: dist/
+npm run preview         # Preview production build locally
+```
 
-## Expanding the ESLint configuration
+## Pages
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/register` | Register | Create account (org registration) |
+| `/login` | Login | Sign in |
+| `/` | Dashboard | Stats, charts, live gallery |
+| `/history` | History | Filterable detection table + CSV export |
+| `/map` | MapView | Leaflet map with fire/smoke markers |
+| `/insights` | Insights | AI risk assessment + Q&A chatbot |
+| `/settings` | Settings | Profile, password, hardware access code |
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_BACKEND_URL` | Backend API URL (defaults to `http://localhost:5000` in dev) |

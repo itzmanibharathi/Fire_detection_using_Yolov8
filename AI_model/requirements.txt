@@ -6,5 +6,3 @@ cloudinary
 requests
 numpy
 pygame
-geocoder
-pymongo

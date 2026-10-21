@@ -7,10 +7,13 @@ import { motion } from "framer-motion";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [organization, setOrganization] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
   const { register } = useAuth();
@@ -19,17 +22,40 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
+    // Client-side field presence check
     if (!fullName.trim() || !email.trim() || !phone.trim() || !organization.trim() || !password) {
       setError("Please fill in all required fields.");
       return;
     }
 
+    // Email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    // Minimum password length
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    // Password confirmation check
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
     try {
       await register(email.trim(), password, fullName.trim(), phone.trim(), organization.trim());
       navigate("/");
     } catch (err) {
       setError(typeof err === "string" ? err : err.message || err.error || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +152,7 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-background/50 border border-border-subtle text-text-main placeholder-gray-500 rounded-xl py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-inner"
-              placeholder="Secure Password"
+              placeholder="Password (min. 8 characters)"
               required
             />
             <div 
@@ -136,14 +162,35 @@ const Register = () => {
               {showPassword ? <FiEyeOff className="text-text-muted hover:text-primary transition-colors" /> : <FiEye className="text-text-muted hover:text-primary transition-colors" />}
             </div>
           </div>
+
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <FiLock className="text-text-muted transition-colors group-focus-within:text-primary" />
+            </div>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full bg-background/50 border border-border-subtle text-text-main placeholder-gray-500 rounded-xl py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-inner"
+              placeholder="Confirm Password"
+              required
+            />
+            <div 
+              className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <FiEyeOff className="text-text-muted hover:text-primary transition-colors" /> : <FiEye className="text-text-muted hover:text-primary transition-colors" />}
+            </div>
+          </div>
           
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
             type="submit"
-            className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-primary/20 flex justify-center items-center mt-2"
+            disabled={loading}
+            className="w-full bg-primary hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-primary/20 flex justify-center items-center mt-2"
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </motion.button>
         </form>
         
